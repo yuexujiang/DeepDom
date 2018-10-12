@@ -8,7 +8,7 @@ tf.Session(config=config)
 import re
 import pandas as pd
 import keras.utils.np_utils as kutils
-rom keras.layers import GlobalMaxPooling1D
+from keras.layers import GlobalMaxPooling1D
 from keras.layers import Input, Dense, Conv1D, MaxPooling1D, UpSampling1D,GlobalMaxPooling1D,Dropout,BatchNormalization
 from keras.layers import *
 from keras.layers import CuDNNLSTM
