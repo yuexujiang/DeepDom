@@ -13,8 +13,12 @@ By fine tuning the hyper-parameters, We have already trained a model and saved i
 
 3. Predict
 
-To predict domain boundary for a protein sequence, firstly, users need to transformat the .fasta sequence using "dataprocess.pl" as usage 1 and specify the location of the processed sequence data in "predict.py". Users also need to load a trained model, either users' own model or the model we provided.
+To predict domain boundary for protein sequences, firstly, users need to transformat the .fasta sequence using "dataprocess.pl" (run "perl dataprocess.pl -h" to see the helps) and using "predict.py" to predict for protein sequences (run "python predict.py -h" to see the helps). Either users' own model or the model we provided can be used for prediction.
+Examples:
 
-We comment the parts in the codes where users' inputs are needed.
+perl dataprocess.pl -input_seq sample_data_seq.txt -input_label sample_data_label.txt -output_seq processed_seq.txt -output_label processed_label.txt
+
+python predict.py -input processed_seq.txt -output predict_result.txt
+
 
 If you find the codes or our method is useful, please cite our paper "DeepDom: Predicting protein domain boundary from sequence alone using stacked bidirectional LSTM".
