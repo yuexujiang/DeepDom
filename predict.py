@@ -10,8 +10,6 @@ import keras
 from keras.models import Model, Sequential
 from  keras.callbacks import EarlyStopping, ModelCheckpoint
 import numpy as np
-from sklearn.metrics import matthews_corrcoef
-from sklearn.metrics import confusion_matrix
 #from keras.activations import softmax
 from keras.layers import Activation
 import random
