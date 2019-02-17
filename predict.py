@@ -1,14 +1,8 @@
 import sys
-import os
-os.environ["CUDA_VISIBLE_DEVICES"]="1";
-import tensorflow as tf
-config=tf.ConfigProto()
-config.gpu_options.per_process_gpu_memory_fraction=0.9
-tf.Session(config=config)
 import re
 import pandas as pd
 import keras.utils.np_utils as kutils
-rom keras.layers import GlobalMaxPooling1D
+from keras.layers import GlobalMaxPooling1D
 from keras.layers import Input, Dense, Conv1D, MaxPooling1D, UpSampling1D,GlobalMaxPooling1D,Dropout,BatchNormalization
 from keras.layers import *
 from keras.layers import CuDNNLSTM
@@ -27,6 +21,7 @@ from keras.models import load_model
 from keras import layers
 import keras.backend as K
 from numpy import median
+import argparse
 def convertSampleToPhysicsVector_pca(seq):
     """
     Convertd the raw data to physico-chemical property
@@ -111,63 +106,77 @@ def update_list(stride,num,comp,pred_score,pred):
     return pred  
 
 
-model=load_model("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.h5")                           #Load your trained model here, or use the model we provided
-win=300                                                                  #specify the window size and stride size, note: they must be the same values as in dataprocess.pl
-stride=80
 
-##########################To predict#############################
-testseqfile="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";                                   #the position of the processed sequence data to be predicted (output from dataprocess.pl)
-(testids,testseqs)=process_inputseqs(testseqfile)
-testX=[convertSampleToPhysicsVector_pca(i) for i in testseqs]
-
-tt=np.dstack(testX)
-tt=np.rollaxis(tt,-1)
-posscore=model.predict(tt)
-fo=open('xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx', 'w')                     #the position where you save the prediction result
-
-regex = r"(\d+)left(\d+)"
-pred=""
-for i in range(len(testids)):
-     com=testids[i].split("_")
-     seql=int(com[3])
-     num_ind=com[4]  
-     pred_score=posscore[i][:,1]  
-     if re.search(regex,num_ind):
-         match = re.search(regex, num_ind)
-         num=int(match.group(1))
-         comp=int(match.group(2))   
-         if num==0:
-           pred=np.zeros(seql)
-           name="_".join(p for p in com[0:4])
-           fo.write(name+"\n")
-         for j in range(comp):
-             if pred_score[j]>pred[j+num*stride]:
-                  pred[j+num*stride]=pred_score[j]   
-         score=' '.join([str(x) for x in pred])   
-         fo.write(score+"\n")
-     elif num_ind=="0":
-         pred=np.zeros(seql)
-         num=int(num_ind)
-         for j in range(100):
-             if pred_score[j]>pred[j+num*stride]:
-                  pred[j+num*stride]=pred_score[j]
-         name="_".join(p for p in com[0:4])
-         fo.write(name+"\n")    
-         if (num*stride+win)==seql:
-             score=' '.join([str(x) for x in pred])
+def main():
+    parser=argparse.ArgumentParser(description='MusiteDeep prediction tool for general, kinase-specific phosphorylation prediction or custom PTM prediction by using custom models.')
+    parser.add_argument('-input',  dest='inputfile', type=str, help='Processed sequence data to be predicted (output from dataprocess.pl).', required=True)
+    parser.add_argument('-output',  dest='outputfile', type=str, help='file name of the prediction results.', required=True)
+    parser.add_argument('-model-prefix',  dest='modelprefix', type=str, help='File name of the custom model used for prediciton. If donnot have one, please run train.py to generate the model', required=False,default=None)
+    parser.add_argument('-windowsize', dest='window',type = int, help='specify the window size, must be the same values as in dataprocess.pl',required=False,default=300)
+    parser.add_argument('-stridesize', dest='stride',type = int, help='specify the stride size, must be the same values as in dataprocess.pl',required=False,default=80)
+    args = parser.parse_args()
+    inputfile=args.inputfile;
+    outputfile=args.outputfile;
+    modelprefix=args.modelprefix
+    win = args.window
+    stride = args.stride
+    ##########################To predict#############################
+    if modelprefix is None:
+         modelprefix = "foldmodel_bilstmwrapper_4sum200_80_40nr_sliwin.h5"
+    
+    model=load_model(modelprefix)
+    (testids,testseqs)=process_inputseqs(inputfile)
+    testX=[convertSampleToPhysicsVector_pca(i) for i in testseqs]
+    
+    tt=np.dstack(testX)
+    tt=np.rollaxis(tt,-1)
+    posscore=model.predict(tt)
+    fo=open('outputfile', 'w')
+    
+    regex = r"(\d+)left(\d+)"
+    pred=""
+    for i in range(len(testids)):
+         com=testids[i].split("_")
+         seql=int(com[3])
+         num_ind=com[4]  
+         pred_score=posscore[i][:,1]  
+         if re.search(regex,num_ind):
+             match = re.search(regex, num_ind)
+             num=int(match.group(1))
+             comp=int(match.group(2))   
+             if num==0:
+               pred=np.zeros(seql)
+               name="_".join(p for p in com[0:4])
+               fo.write(name+"\n")
+             for j in range(comp):
+                 if pred_score[j]>pred[j+num*stride]:
+                      pred[j+num*stride]=pred_score[j]   
+             score=' '.join([str(x) for x in pred])   
              fo.write(score+"\n")
-     else:    
-         num=int(num_ind)
-         for j in range(100):
-             if pred_score[j]>pred[j+num*stride]:
-                  pred[j+num*stride]=pred_score[j]
-         if (num*stride+win)==seql:
-             score=' '.join([str(x) for x in pred])
-             fo.write(score+"\n")
+         elif num_ind=="0":
+             pred=np.zeros(seql)
+             num=int(num_ind)
+             for j in range(100):
+                 if pred_score[j]>pred[j+num*stride]:
+                      pred[j+num*stride]=pred_score[j]
+             name="_".join(p for p in com[0:4])
+             fo.write(name+"\n")    
+             if (num*stride+win)==seql:
+                 score=' '.join([str(x) for x in pred])
+                 fo.write(score+"\n")
+         else:    
+             num=int(num_ind)
+             for j in range(100):
+                 if pred_score[j]>pred[j+num*stride]:
+                      pred[j+num*stride]=pred_score[j]
+             if (num*stride+win)==seql:
+                 score=' '.join([str(x) for x in pred])
+                 fo.write(score+"\n")
+    
+    
+             
+    fo.close() 
 
 
-         
-fo.close() 
-
-
-
+if __name__ == "__main__":
+    main()         
