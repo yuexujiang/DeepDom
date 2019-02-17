@@ -29,7 +29,7 @@ python predict.py -input processed_seq.txt -output predict_result.txt
 ```
 Or users can use the custom model trained (as shown in 1) by their own data to predict.
  ```sh
-python predict.py -input processed_seq.txt -output predict_result.txt --model-prefix custom_model.h5
+python predict.py -input processed_seq.txt -output predict_result.txt -model-prefix custom_model.h5
 ```
 
 If you find the codes or our method is useful, please cite our paper "DeepDom: Predicting protein domain boundary from sequence alone using stacked bidirectional LSTM".
