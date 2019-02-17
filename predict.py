@@ -131,7 +131,7 @@ def main():
     tt=np.dstack(testX)
     tt=np.rollaxis(tt,-1)
     posscore=model.predict(tt)
-    fo=open('outputfile', 'w')
+    fo=open(outputfile, 'w')
     
     regex = r"(\d+)left(\d+)"
     pred=""
