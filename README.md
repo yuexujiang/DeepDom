@@ -16,7 +16,7 @@ perl dataprocess.pl -input_seq sample_data_seq.txt -input_label sample_data_labe
 python train.py -seqfil processed_seq.txt -labelfile processed_label.txt -model-prefix custom_model.h5
 ```
 
-custom_model.h5 is the model generated, users can used this file to predict. and also use our pre-trained model that mentioned in our paper. The pre-trained model was saved in file "foldmodel_bilstmwrapper_4sum200_80_40nr_sliwin.h5".
+custom_model.h5 is the model generated, users can use this file to predict and can also use our pre-trained model that mentioned in our paper. The pre-trained model was saved in file "foldmodel_bilstmwrapper_4sum200_80_40nr_sliwin.h5".
 
 ###
 2. Predict
