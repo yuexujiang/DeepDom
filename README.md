@@ -27,7 +27,7 @@ perl dataprocess.pl -input_seq sample_data_seq.txt -input_label sample_data_labe
 
 python predict.py -input processed_seq.txt -output predict_result.txt
 ```
-Or users can use the custom model trained (as shown in 1) by their own model to predict.
+Or users can use the custom model trained (as shown in 1) by their own data to predict.
  ```sh
 python predict.py -input processed_seq.txt -output predict_result.txt --model-prefix custom_model.h5
 ```
