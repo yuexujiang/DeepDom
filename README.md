@@ -33,8 +33,7 @@ Change the default configuration file into:
 
 >If you want to use GPU, you also need to install [CUDA]( https://developer.nvidia.com/cuda-toolkit) and [cuDNN](https://developer.nvidia.com/cudnn); refer to their websites for instructions. 
 CPU is only suitable for prediction not training. 
-##
-Usage:
+## Usage:
 ## 1. Train a model by your own data
 
 To train a model, users should have .fasta file for protein sequences and domain boundary annotations on corresponding protein sequences.
