@@ -1,14 +1,9 @@
 import sys
 import os
-os.environ["CUDA_VISIBLE_DEVICES"]="1";
-import tensorflow as tf
-config=tf.ConfigProto()
-config.gpu_options.per_process_gpu_memory_fraction=0.8
-tf.Session(config=config)
 import re
 import pandas as pd
 import keras.utils.np_utils as kutils
-rom keras.layers import GlobalMaxPooling1D
+from keras.layers import GlobalMaxPooling1D
 from keras.layers import Input, Dense, Conv1D, MaxPooling1D, UpSampling1D,GlobalMaxPooling1D,Dropout,BatchNormalization
 from keras.layers import *
 from keras.layers import CuDNNLSTM
@@ -25,6 +20,8 @@ from keras.layers import Concatenate
 from keras.models import load_model
 from keras import layers
 import keras.backend as K
+import argparse
+
 def convertSampleToPhysicsVector_pca(seq):
     """
     Convertd the raw data to physico-chemical property
@@ -139,82 +136,84 @@ def process_inputlabels(file):
         ids.append(prot_id)
     return (ids,labels)
 
+def main():
+    parser=argparse.ArgumentParser(description='MusiteDeep prediction tool for general, kinase-specific phosphorylation prediction or custom PTM prediction by using custom models.')
+    parser.add_argument('-seqfile',  dest='seqfile', type=str, help='Processed sequence data to be trained (output from dataprocess.pl).', required=True)
+    parser.add_argument('-labelfile',  dest='labelfile', type=str, help='Processed label data to be trained (output from dataprocess.pl).', required=True)
+    parser.add_argument('-model-prefix',  dest='modelprefix', type=str, help='File name of the generated model.', required=True)
+    parser.add_argument('-lossfile',  dest='lossfile', type=str, help='Specify a file to store "loss" history during the training process', required=False,default="history_loss.txt")
+    args = parser.parse_args()
+    seqfile=args.seqfile; #file name of the processed sequence data (output from dataprocess.pl)
+    labelfile=args.labelfile; #file name of the processed label data (output from dataprocess.pl)
+    modelprefix=args.modelprefix
+    lossfile = args.lossfile
+    (ids,seqs)=process_inputseqs(seqfile)
+    (ids,labels)=process_inputlabels(labelfile)
+    rawdata=zip(seqs,labels)
+    random.shuffle(rawdata)
+    inputX=[convertSampleToPhysicsVector_pca(i[0]) for i in rawdata]
+    inputY=[convertlabels_to_categorical(i[1]) for i in rawdata]
+    
+    
+    data=zip(inputX,inputY)
+    random.seed(4)
+    random.shuffle(data)
+    random.shuffle(data)
+    
+    train_num=int(len(inputX)*0.9)
+    train=data[0:train_num]
+    val=data[train_num:]
+    
+    
+    
+    trainX=[i[0] for i in train]
+    trainY=[i[1] for i in train]
+    xx=np.dstack(trainX)
+    xx=np.rollaxis(xx,-1)
+    
+    yy=np.dstack(trainY)
+    yy=np.rollaxis(yy,-1)
+    
+    valX=[i[0] for i in val]
+    valY=[i[1] for i in val]
+    valX=np.dstack(valX)
+    valX=np.rollaxis(valX,-1)
+    valY=np.dstack(valY)
+    valY=np.rollaxis(valY,-1)
+    
+    ####################
+    input =Input(shape=(None,inputX[0].shape[1]))
+    
+    x1 = layers.Bidirectional(CuDNNLSTM(100,return_sequences=True),merge_mode='sum')(input)
+    
+    x2 = layers.Bidirectional(CuDNNLSTM(100,return_sequences=True),merge_mode='sum')(x1)
+    
+    x3 = layers.Bidirectional(CuDNNLSTM(100,return_sequences=True),merge_mode='sum')(x2)
+    x4 = layers.Bidirectional(CuDNNLSTM(3,return_sequences=True),merge_mode='sum')(x3)
+    
+    output=Activation('softmax')(x4)
+    
+    model=Model(input,output)
+    early_stopping = EarlyStopping(monitor='val_loss', patience=10)
+    model.compile(loss='binary_crossentropy',optimizer='adam',metrics=['accuracy'])
+    
+    vv=(valX,valY)
+    
+    fitHistory_batch = model.fit(x=xx,y=yy, batch_size=1000, validation_data=vv,epochs=100,callbacks=[early_stopping])
+    
+    
+    model.save(modelprefix)                                           #specify the location where your trained model(.h5 file) would be saved
+    
+    trainloss=fitHistory_batch.history['loss']
+    valloss=fitHistory_batch.history['val_loss']
+    outputfile = open(lossfile, 'w')                 #specify a file to store "loss" history during the training process
+    
+    for i in range(len(trainloss)):
+      print >> outputfile, "%f\t%f"%(trainloss[i],valloss[i])
+    
+    outputfile.close()
+    
+    
 
-seqfile="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";                         #the position of the processed sequence data (output from dataprocess.pl)
-labelfile="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";                         #the position of the processed label data (output from dataprocess.pl)
-(ids,seqs)=process_inputseqs(seqfile)
-(ids,labels)=process_inputlabels(labelfile)
-rawdata=zip(seqs,labels)
-random.shuffle(rawdata)
-inputX=[convertSampleToPhysicsVector_pca(i[0]) for i in rawdata]
-inputY=[convertlabels_to_categorical(i[1]) for i in rawdata]
-
-
-data=zip(inputX,inputY)
-random.seed(4)
-random.shuffle(data)
-random.shuffle(data)
-
-train_num=int(len(inputX)*0.9)
-train=data[0:train_num]
-val=data[train_num:]
-
-
-
-trainX=[i[0] for i in train]
-trainY=[i[1] for i in train]
-xx=np.dstack(trainX)
-xx=np.rollaxis(xx,-1)
-
-yy=np.dstack(trainY)
-yy=np.rollaxis(yy,-1)
-
-valX=[i[0] for i in val]
-valY=[i[1] for i in val]
-valX=np.dstack(valX)
-valX=np.rollaxis(valX,-1)
-valY=np.dstack(valY)
-valY=np.rollaxis(valY,-1)
-
-####################
-input =Input(shape=(None,inputX[0].shape[1]))
-
-x1 = layers.Bidirectional(CuDNNLSTM(100,return_sequences=True),merge_mode='sum')(input)
-
-x2 = layers.Bidirectional(CuDNNLSTM(100,return_sequences=True),merge_mode='sum')(x1)
-
-x3 = layers.Bidirectional(CuDNNLSTM(100,return_sequences=True),merge_mode='sum')(x2)
-x4 = layers.Bidirectional(CuDNNLSTM(3,return_sequences=True),merge_mode='sum')(x3)
-
-output=Activation('softmax')(x4)
-
-model=Model(input,output)
-early_stopping = EarlyStopping(monitor='val_loss', patience=10)
-model.compile(loss='binary_crossentropy',optimizer='adam',metrics=['accuracy'])
-
-vv=(valX,valY)
-
-fitHistory_batch = model.fit(x=xx,y=yy, batch_size=1000, validation_data=vv,epochs=100,callbacks=[early_stopping])
-
-
-model.save("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.h5")                                           #specify the location where your trained model(.h5 file) would be saved
-
-trainloss=fitHistory_batch.history['loss']
-valloss=fitHistory_batch.history['val_loss']
-outputfile = open("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx", 'w')                 #specify a file to store "loss" history during the training process
-
-for i in range(len(trainloss)):
-  print >> outputfile, "%f\t%f"%(trainloss[i],valloss[i])
-
-outputfile.close()
-
-
-trainArr=fitHistory_batch.history['acc']
-valArr=fitHistory_batch.history['val_acc']
-outputfile = open("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx", 'w')            #specify a file to store "accuracy" history during the training process
-
-for i in range(len(trainArr)):
-  print >> outputfile, "%f\t%f"%(trainArr[i],valArr[i])
-
-outputfile.close()
-
+if __name__ == "__main__":
+    main()         
