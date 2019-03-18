@@ -110,7 +110,7 @@ def main():
     parser.add_argument('-input',  dest='inputfile', type=str, help='Processed sequence data to be predicted (output from dataprocess.pl).', required=True)
     parser.add_argument('-output',  dest='outputfile', type=str, help='file name of the prediction results.', required=True)
     parser.add_argument('-model-prefix',  dest='modelprefix', type=str, help='File name of the custom model used for prediciton. If donnot have one, please run train.py to generate the model', required=False,default=None)
-    parser.add_argument('-windowsize', dest='window',type = int, help='specify the window size, must be the same values as in dataprocess.pl',required=False,default=300)
+    parser.add_argument('-windowsize', dest='window',type = int, help='specify the window size, must be the same values as in dataprocess.pl',required=False,default=200)
     parser.add_argument('-stridesize', dest='stride',type = int, help='specify the stride size, must be the same values as in dataprocess.pl',required=False,default=80)
     args = parser.parse_args()
     inputfile=args.inputfile;
