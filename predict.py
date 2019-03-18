@@ -133,46 +133,55 @@ def main():
     regex = r"(\d+)left(\d+)"
     pred=""
     for i in range(len(testids)):
-         com=testids[i].split("_")
-         seql=int(com[3])
-         num_ind=com[4]  
-         pred_score=posscore[i][:,1]  
-         if re.search(regex,num_ind):
-             match = re.search(regex, num_ind)
-             num=int(match.group(1))
-             comp=int(match.group(2))   
-             if num==0:
-               pred=np.zeros(seql)
-               name="_".join(p for p in com[0:4])
-               fo.write(name+"\n")
-             for j in range(comp):
-                 if pred_score[j]>pred[j+num*stride]:
-                      pred[j+num*stride]=pred_score[j]   
-             score=' '.join([str(x) for x in pred])   
+     com=testids[i].split("_")
+     seql=int(com[3])
+     num_ind=com[4]  
+     pred_score=posscore[i][:,1]  
+     
+     if re.search(regex,num_ind):
+         match = re.search(regex, num_ind)
+         num=int(match.group(1))
+         comp=int(match.group(2))   
+         if num==0:
+           #pred=np.zeros(seql)
+           pred=initial_list(seql)
+           name="_".join(p for p in com[0:4])
+           fo.write(name+"\n")
+         pred=update_list(stride,num,comp,pred_score,pred)
+         #for j in range(comp):
+             #if pred_score[j]>pred[j+num*stride]:
+                  #pred[j+num*stride]=pred_score[j]   
+         #score=' '.join([str(x) for x in pred])
+         score=' '.join([str(median(x)) for x in pred])   
+         fo.write(score+"\n")
+     elif num_ind=="0":
+         #pred=np.zeros(seql)
+         pred=initial_list(seql)
+         num=int(num_ind)
+         #for j in range(win):
+             #if pred_score[j]>pred[j+num*stride]:
+                  #pred[j+num*stride]=pred_score[j]
+         pred=update_list(stride,num,win,pred_score,pred)
+         name="_".join(p for p in com[0:4])
+         fo.write(name+"\n")    
+         if (num*stride+win)==seql:
+             #score=' '.join([str(x) for x in pred])
+             score=' '.join([str(median(x)) for x in pred])
              fo.write(score+"\n")
-         elif num_ind=="0":
-             pred=np.zeros(seql)
-             num=int(num_ind)
-             for j in range(100):
-                 if pred_score[j]>pred[j+num*stride]:
-                      pred[j+num*stride]=pred_score[j]
-             name="_".join(p for p in com[0:4])
-             fo.write(name+"\n")    
-             if (num*stride+win)==seql:
-                 score=' '.join([str(x) for x in pred])
-                 fo.write(score+"\n")
-         else:    
-             num=int(num_ind)
-             for j in range(100):
-                 if pred_score[j]>pred[j+num*stride]:
-                      pred[j+num*stride]=pred_score[j]
-             if (num*stride+win)==seql:
-                 score=' '.join([str(x) for x in pred])
-                 fo.write(score+"\n")
-    
-    
-             
-    fo.close() 
+     else:    
+         num=int(num_ind)
+         #for j in range(win):
+             #if pred_score[j]>pred[j+num*stride]:
+                  #pred[j+num*stride]=pred_score[j]
+         pred=update_list(stride,num,win,pred_score,pred)
+         if (num*stride+win)==seql:
+             #score=' '.join([str(x) for x in pred])
+             score=' '.join([str(median(x)) for x in pred])
+             fo.write(score+"\n")
+
+
+         
+    fo.close()
 
 
 if __name__ == "__main__":
