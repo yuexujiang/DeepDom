@@ -143,58 +143,31 @@ close $cath_lable_ntr;
 
 
 __END__
-
 =head1 NAME
-
 dataprocess.pl
-
 =head1 SYNOPSIS
-
 perl dataprocess.pl [options] -input_seq <sequence file> -input_label <label file> -output_seq <output sequence file> -output_label <output label file>
-
 =head1 ARGUMENTS
-
 =over
-
 =item B<-input_seq> <sequence file>
-
 the name of your input sequence data, in the fasta format.
-
 =item B<-input_label> <label file>
-
 the name of your input label data.
-
 =item B<-output_seq> <output sequence file>
-
 the output file name of the processed sequence data
-
 =item B<-output_label> <output label file>
-
 the output file name of the processed label data
-
 =back
-
 =head1 OPTIONS
-
 =over 
 	   
 =item B<-windowsize> <size of window> 
-
 the size of overlapping window.(Default: 300)
-
 =item B<-stridesize> <size of stride> 
-
 the size of stride.(Default: 80)
-
 =item B<-h|--help>   
-
 Show help information.
-
 =back
-
 =head1 OUTPUT
-
 This program will generate processed sequence data and label data.
-
 =cut
-

@@ -1,22 +1,7 @@
 import sys
 import re
-import keras.utils.np_utils as kutils
-from keras.layers import GlobalMaxPooling1D
-from keras.layers import Input, Dense, Conv1D, MaxPooling1D, UpSampling1D,GlobalMaxPooling1D,Dropout,BatchNormalization
-from keras.layers import *
-from keras.layers import CuDNNLSTM
-import keras
-from keras.models import Model, Sequential
-from  keras.callbacks import EarlyStopping, ModelCheckpoint
 import numpy as np
-#from keras.activations import softmax
-from keras.layers import Activation
-import random
-from keras.optimizers import Adam
-from keras.layers import Concatenate
 from keras.models import load_model
-from keras import layers
-import keras.backend as K
 from numpy import median
 import argparse
 def convertSampleToPhysicsVector_pca(seq):
