@@ -90,12 +90,12 @@ def update_list(stride,num,comp,pred_score,pred):
 
 
 def main():
-    parser=argparse.ArgumentParser(description='MusiteDeep prediction tool for general, kinase-specific phosphorylation prediction or custom PTM prediction by using custom models.')
+    parser=argparse.ArgumentParser(description='DeepDom: Predicting protein domain boundary from sequence alone using stacked bidirectional LSTM')
     parser.add_argument('-input',  dest='inputfile', type=str, help='Processed sequence data to be predicted (output from dataprocess.pl).', required=True)
     parser.add_argument('-output',  dest='outputfile', type=str, help='file name of the prediction results.', required=True)
-    parser.add_argument('-model-prefix',  dest='modelprefix', type=str, help='File name of the custom model used for prediciton. If donnot have one, please run train.py to generate the model', required=False,default=None)
-    parser.add_argument('-windowsize', dest='window',type = int, help='specify the window size, must be the same values as in dataprocess.pl',required=False,default=200)
-    parser.add_argument('-stridesize', dest='stride',type = int, help='specify the stride size, must be the same values as in dataprocess.pl',required=False,default=80)
+    parser.add_argument('-model-prefix',  dest='modelprefix', type=str, help='File name of the custom model used for prediciton. If not have one, the default is of 200 window size and 80 stride size OR running train.py to generate a model', required=False,default=None)
+    parser.add_argument('-windowsize', dest='window',type = int, help='specify the window size, must be the same values as in dataprocess.pl and in the model used',required=False,default=200)
+    parser.add_argument('-stridesize', dest='stride',type = int, help='specify the stride size, must be the same values as in dataprocess.pl and in the model used',required=False,default=80)
     args = parser.parse_args()
     inputfile=args.inputfile;
     outputfile=args.outputfile;
