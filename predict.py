@@ -119,8 +119,9 @@ def main():
     pred=""
     for i in range(len(testids)):
      com=testids[i].split("_")
-     seql=int(com[3])
-     num_ind=com[4]  
+     com_len=len(com)
+     seql=int(com[com_len-2])
+     num_ind=com[com_len-1]  
      pred_score=posscore[i][:,1]  
      
      if re.search(regex,num_ind):
