@@ -131,7 +131,7 @@ def main():
          if num==0:
            #pred=np.zeros(seql)
            pred=initial_list(seql)
-           name="_".join(p for p in com[0:4])
+           name="_".join(p for p in com[0:(com_len-1)])
            fo.write(name+"\n")
          pred=update_list(stride,num,comp,pred_score,pred)
          #for j in range(comp):
@@ -148,7 +148,7 @@ def main():
              #if pred_score[j]>pred[j+num*stride]:
                   #pred[j+num*stride]=pred_score[j]
          pred=update_list(stride,num,win,pred_score,pred)
-         name="_".join(p for p in com[0:4])
+         name="_".join(p for p in com[0:(com_len-1)])
          fo.write(name+"\n")    
          if (num*stride+win)==seql:
              #score=' '.join([str(x) for x in pred])
