@@ -2,8 +2,8 @@
 DeepDom is an ab-initio method for protein domain boundary prediction
 ## Installation
 
-  - Installation has been tested in Linux and Mac OS X with Python 2.7. 
-  - Since the package is written in python 2.7, [python 2.7](https://www.python.org/downloads/ ) with the pip tool must be installed first. 
+  - Installation has been tested in Linux and Mac OS X with Python 3.5. 
+  - Since the package is written in python 3.5, [python 3.5](https://www.python.org/downloads/ ) with the pip tool must be installed first. 
 DeepDom uses the following dependencies:
 numpy,  scipy, pandas, h5py, keras version==2.1.2, tensorflow==1.3.0
 You can install these packages first, by the following commands:
