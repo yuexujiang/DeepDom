@@ -52,15 +52,21 @@ custom_model.h5 is the model generated, users can use this file to predict and c
 
 To predict domain boundary for protein sequences, firstly, users need to transformat the .fasta sequence using "dataprocess.pl" (run "perl dataprocess.pl -h" to see the helps) and using "predict.py" to predict for protein sequences (run "python predict.py -h" to see the helps). Either users' own model or the model we provided can be used for prediction.
 #### Examples (using our provided example data):
+For GPU users:
 ```sh
 perl dataprocess.pl -input_seq sample_data_seq.txt -output_seq processed_seq.txt
 
 python predict.py -input processed_seq.txt -output predict_result.txt
 ```
+For CPU users, be sure to add -model-prefix cpu_model.h5 when call predict.py:
+```sh
+perl dataprocess.pl -input_seq sample_data_seq.txt -output_seq processed_seq.txt
+
+python predict.py -input processed_seq.txt -output predict_result.txt -model-prefix cpu_model.h5
+```
 Or users can use the custom model trained (as shown in 1) by their own data to predict.
  ```sh
 python predict.py -input processed_seq.txt -output predict_result.txt -model-prefix custom_model.h5
 ```
-###### CPU examples:
 
 If you find the codes or our method is useful, please cite our paper "DeepDom: Predicting protein domain boundary from sequence alone using stacked bidirectional LSTM".
