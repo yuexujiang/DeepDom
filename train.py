@@ -147,13 +147,13 @@ def main():
     lossfile = args.lossfile
     (ids,seqs)=process_inputseqs(seqfile)
     (ids,labels)=process_inputlabels(labelfile)
-    rawdata=zip(seqs,labels)
+    rawdata=list(zip(seqs,labels))
     random.shuffle(rawdata)
     inputX=[convertSampleToPhysicsVector_pca(i[0]) for i in rawdata]
     inputY=[convertlabels_to_categorical(i[1]) for i in rawdata]
     
     
-    data=zip(inputX,inputY)
+    data=list(zip(inputX,inputY))
     random.seed(4)
     random.shuffle(data)
     random.shuffle(data)
