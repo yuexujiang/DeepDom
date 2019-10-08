@@ -52,7 +52,7 @@ custom_model.h5 is the model generated, users can use this file to predict and c
 
 To predict domain boundary for protein sequences, firstly, users need to transformat the .fasta sequence using "dataprocess.pl" (run "perl dataprocess.pl -h" to see the helps) and using "predict.py" to predict for protein sequences (run "python predict.py -h" to see the helps). Either users' own model or the model we provided can be used for prediction.
 #### Examples (using our provided example data):
-For GPU users:
+For GPU users, predict.py will use our pre-trained GPU model "foldmodel_bilstmwrapper_4sum200_80_40nr_sliwin.h5":
 ```sh
 perl dataprocess.pl -input_seq sample_data_seq.txt -output_seq processed_seq.txt
 
