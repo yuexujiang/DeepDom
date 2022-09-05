@@ -33,6 +33,9 @@ Change the default configuration file into:
 
 >If you want to use GPU, you also need to install [CUDA]( https://developer.nvidia.com/cuda-toolkit) and [cuDNN](https://developer.nvidia.com/cudnn); refer to their websites for instructions. 
 CPU is only suitable for prediction not training. 
+## Training data
+
+Since the data size is larger than the Github limitation, the training data for DeepDom is stored at Google Drive that can be accessed through the link https://drive.google.com/drive/folders/1HsHEbk1gjtEdivr9vvOpXPK7MsoBZp3h?usp=sharing
 ## Usage:
 ## 1. Train a model by your own data
 
